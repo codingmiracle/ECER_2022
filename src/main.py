@@ -40,30 +40,7 @@ def main():
 
     # set the console just how we want it
     set_cursor(OFF)
-
-    ts = ev3sensors.TouchSensor(ev3inputs.INPUT_1)
-    leds = ev3leds.Leds()
-
-    print("Press the touch sensor to change the LED color!")
-
-    ml = ev3motors.LargeMotor(ev3motors.OUTPUT_B)
-    mr = ev3motors.LargeMotor(ev3motors.OUTPUT_C)
-    ma = ev3motors.MediumMotor(ev3motors.OUTPUT_A)
-    ml.stop_action = ml.STOP_ACTION_BRAKE
-    mr.stop_action = mr.STOP_ACTION_BRAKE
-    ml.duty_cycle_sp = 50
-    mr.duty_cycle_sp = 50
-    while True:
-        debug_print(ml.position)
-        debug_print(mr.position)
-        ml.run_direct()
-        mr.run_direct()
-        if ts.is_pressed or ml.position > 4000:
-            ml.stop()
-            mr.stop()
-            break
-    #ma.on_for_degrees(ev3motors.SpeedPercent(100), 135)
-    #ma.on_for_degrees(ev3motors.SpeedPercent(100), -135)
+    
 
 
 if __name__ == '__main__':
