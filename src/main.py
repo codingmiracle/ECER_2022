@@ -2,11 +2,13 @@
 
 import os
 import sys
-import time
 import ev3dev2.led as ev3leds
 import ev3dev2.sensor.lego as ev3sensors
 import ev3dev2.sensor as ev3inputs
 import ev3dev2.motor as ev3motors
+import ev3dev2.wheel
+
+from drive import *
 
 # state constants
 ON = True
@@ -40,7 +42,17 @@ def main():
 
     # set the console just how we want it
     set_cursor(OFF)
-    
+
+    bumper = Bumper(ev3inputs.INPUT_2, ev3inputs.INPUT_3)
+    driveAdapter = MoveDifferential(OUTPUT_B, OUTPUT_C, ev3dev2.wheel.EV3Tire, 108)
+    driveAdapter.odometry_start()
+
+    driveAdapter.on_to_coordinates(SpeedRPM(80), 300, 300)
+
+
+
+
+    driveAdapter.odometry_stop()
 
 
 if __name__ == '__main__':
