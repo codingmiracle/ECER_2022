@@ -1,2 +1,5 @@
 # ECER2022
-Lets go for ECER
+
+* check virtual environment python in VS-Code
+* Documentation: https://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/ev3dev-stretch/motors.html
+* always pull/push after commit!!!
