@@ -2,11 +2,25 @@
     "version": "0.2.0",
     "configurations": [
 
+
+
         {
-            "name": "Download and Run main.py",
+            "name": "Download and Test",
             "type": "ev3devBrowser",
             "request": "launch",
-            "program": "/home/robot/${workspaceFolderBasename}/src/main.py"
+            "program": "/home/robot/${workspaceFolderBasename}/src/test.py"
+        },
+        {
+            "name": "BigBot",
+            "type": "ev3devBrowser",
+            "request": "launch",
+            "program": "/home/robot/${workspaceFolderBasename}/src/bigBot.py"
+        },
+        {
+            "name": "SmallBot",
+            "type": "ev3devBrowser",
+            "request": "launch",
+            "program": "/home/robot/${workspaceFolderBasename}/src/smallBot.py"
         },
         {
             "name": "Download and Run Current File",

@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-#------------------
-# useless so far!!!
-#------------------
-
 
 from ev3dev2.motor import *
 from ev3dev2.led import *
@@ -11,6 +7,38 @@ from ev3dev2.led import *
 from ev3dev2.sensor.lego import *
 import ev3dev2.sensor as sensor
 
+#------------------
+# debuging functions
+#------------------
+ON = True
+OFF = False
+
+
+def debug_print(*args, **kwargs):
+    # prints to stderr - messages show up in vscode Output
+    print(*args, **kwargs, file=sys.stderr)
+
+
+def reset_console():
+    print('\x1Bc', end='')
+
+
+def set_cursor(state):
+    # set cursor True/False
+    if state:
+        print('\x1B[?25h', end='')
+    else:
+        print('\x1B[?25l', end='')
+
+
+def set_font(name):
+
+    os.system('setfont ' + name)
+
+
+#------------------
+# our own DriveAdapter
+#------------------
 
 class DriveAdapter(MoveDifferential):
 
@@ -26,6 +54,11 @@ class DriveAdapter(MoveDifferential):
 
     def on_to_coordinates(self, speed, x_target_mm, y_target_mm, brake=True, block=True):
         return super().on_to_coordinates(speed, x_target_mm, y_target_mm, brake, block)
+
+
+#------------------
+# Bumper class
+#------------------
 
 class Bumper:
     def __init__(self,inLeft, inRight) -> None:
