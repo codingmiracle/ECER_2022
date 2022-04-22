@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 from logging import raiseExceptions
-import os
-import sys
 import ev3dev2.led as ev3leds
 import ev3dev2.sensor.lego as ev3sensors
 import ev3dev2.sensor as ev3inputs
@@ -25,7 +23,7 @@ bumper = Bumper(ev3inputs.INPUT_2, ev3inputs.INPUT_3)
 
 driveAdapter = DriveAdapter(OUTPUT_B, OUTPUT_C, ev3dev2.wheel.EV3Tire, 108)
 gripper = Gripper(ev3motors.OUTPUT_A)
-#ropeMotor = ev3motors.MediumMotor(ev3motors.OUTPUT_D)
+ropeMotor = ev3motors.MediumMotor(ev3motors.OUTPUT_D)
 driveAdapter.cs = ls
 
 
@@ -35,7 +33,7 @@ def main():
     # set the console just how we want it
     set_cursor(OFF)
 
-    #waitTillLightsOff
+    waitTillLights(ON, ls)
 
     signal.alarm(118)
 

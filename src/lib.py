@@ -53,6 +53,8 @@ class DriveAdapter(MoveDifferential):
         if inversed:
             super().right_motor.polarity = 'inversed'
             super().left_motor.polarity = 'inversed'
+            super().right_motor.encoder_polarity = 'inversed'
+            super().left_motor.encoder_polarity = 'inversed'
 
     def followLineBackForms(self, cs, ms, startsright=True):
         starttime = time.time()
@@ -86,7 +88,9 @@ class DriveAdapter(MoveDifferential):
             super().on(SpeedRPM(-60), SpeedRPM(-60))
         super().stop()
 
-# pure functions:
+#------------------
+# our functions:
+#------------------
 def followLineBackForms(driveAdapter, cs, ms, startsright=True):
     starttime = time.time()
     isright = startsright
@@ -118,6 +122,15 @@ def driveTillFloorBack(driveAdapter, cs):
     while cs.reflected_light_intensity < 25:
         driveAdapter.on(SpeedRPM(-60), SpeedRPM(-60))
     driveAdapter.stop()
+
+def waitTillLights(state, cs):
+    cs.mode = cs.MODE_COL_AMBIENT
+    if state:
+        while cs.ambient_light_intensity < 40:
+            time.sleep(0.1)
+    else:
+        while cs.ambient_light_intensity > 60:
+            time.sleep(0.1)
 
 
 #------------------
@@ -168,6 +181,7 @@ class Bumper:
 class Gripper(MediumMotor):
     def __init__(self, Port) -> None:
         super().__init__(Port)
+        super().stop_action = super().STOP_ACTION_HOLD
         self.degrees = 0 # 0 = closed, 360 = open
 
     def open(self):

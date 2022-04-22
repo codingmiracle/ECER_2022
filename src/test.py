@@ -24,12 +24,13 @@ class Test(unittest.TestProgram):
         self.ls = ev3sensors.ColorSensor(ev3inputs.INPUT_1)
 
     def run(self):
-        # set the console just how we want it
         set_cursor(OFF)
+        # do your unknown code stuff below here
         self.driveAdapter.driveTillLineBack(self.ls)
         self.driveAdapter.turn_left(spdstd, 45)
         debug_print(self.ls.reflected_light_intensity)
         self.driveAdapter.followLineBackForms(self.ls, 3000)
+        self.driveAdapter.on_for_distance(spdstd, 200)
 
     def loop(self):
         while True:
