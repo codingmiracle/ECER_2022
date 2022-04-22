@@ -18,13 +18,18 @@ from lib import *
 class Test(unittest.TestProgram):
     def __init__(self) -> None:
         self.attributes = "place here"
-        self.bumper = Bumper(ev3inputs.INPUT_2, ev3inputs.INPUT_3)
+        #self.bumper = Bumper(ev3inputs.INPUT_2, ev3inputs.INPUT_3)
         self.leds = ev3leds.Leds()
+        self.driveAdapter =  DriveAdapter(OUTPUT_B, OUTPUT_D, ev3dev2.wheel.EV3Tire, 108)
+        self.ls = ev3sensors.ColorSensor(ev3inputs.INPUT_1)
 
     def run(self):
         # set the console just how we want it
         set_cursor(OFF)
-        self.loop()
+        self.driveAdapter.driveTillLineBack(self.ls)
+        self.driveAdapter.turn_left(spdstd, 45)
+        debug_print(self.ls.reflected_light_intensity)
+        self.driveAdapter.followLineBackForms(self.ls, 3000)
 
     def loop(self):
         while True:
