@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 import unittest
-import os
-import sys
+import threading as th
 import ev3dev2.led as ev3leds
 import ev3dev2.sensor.lego as ev3sensors
 import ev3dev2.sensor as ev3inputs
@@ -20,17 +19,19 @@ class Test(unittest.TestProgram):
         self.attributes = "place here"
         #self.bumper = Bumper(ev3inputs.INPUT_2, ev3inputs.INPUT_3)
         self.leds = ev3leds.Leds()
-        self.driveAdapter =  DriveAdapter(OUTPUT_B, OUTPUT_D, ev3dev2.wheel.EV3Tire, 108)
+        self.driveAdapter =  DriveAdapter(OUTPUT_B, OUTPUT_D, ev3dev2.wheel.EV3Tire, 108, True)
+        self.gripper = Gripper(ev3motors.OUTPUT_A)
+        self.lifter = Lifter(ev3motors.OUTPUT_C)
         self.ls = ev3sensors.ColorSensor(ev3inputs.INPUT_1)
 
     def run(self):
         set_cursor(OFF)
         # do your unknown code stuff below here
-        self.driveAdapter.driveTillLineBack(self.ls)
-        self.driveAdapter.turn_left(spdstd, 45)
-        debug_print(self.ls.reflected_light_intensity)
-        self.driveAdapter.followLineBackForms(self.ls, 3000)
-        self.driveAdapter.on_for_distance(spdstd, 200)
+        waitTillLights(ON, self.ls)
+        debug_print("light is on")
+
+    def do_something(self):
+        print("DONE SUCCESFULLY")
 
     def loop(self):
         while True:

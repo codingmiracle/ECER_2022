@@ -46,82 +46,39 @@ spdstd = SpeedRPM(50)
 spdfast = SpeedRPM(80)
 class DriveAdapter(MoveDifferential):
 
-    def __init__(self, left, right, wheel_class, wheel_dist, inversed) -> None:
+    def __init__(self, left, right, wheel_class, wheel_dist, inversed=False) -> None:
         super().__init__(left, right, wheel_class, wheel_dist)
         super().odometry_start()
         super().odometry_coordinates_log()
+        self.speed = spdstd
         if inversed:
-            super().right_motor.polarity = 'inversed'
-            super().left_motor.polarity = 'inversed'
-            super().right_motor.encoder_polarity = 'inversed'
-            super().left_motor.encoder_polarity = 'inversed'
+            super().set_polarity('inversed')
 
-    def followLineBackForms(self, cs, ms, startsright=True):
+    def setSpeed(self, spd=spdstd):
+        self.speed = spd
+
+    def followLineForMs(self, cs, ms):
         starttime = time.time()
-        isright = startsright
         while time.time() < starttime + ms/1000:
-            if isright:
-                while cs.reflected_light_intensity > 25:
-                    super().on(SpeedRPM(60), SpeedRPM(60))
-                while cs.reflected_light_intensity < 25:
-                    super().on(SpeedRPM(60), SpeedRPM(30))
-                isright = False
-            else:
-                while cs.reflected_light_intensity > 25:
-                    super().on(SpeedRPM(60), SpeedRPM(60))
-                while cs.reflected_light_intensity < 25:
-                    super().on(SpeedRPM(30), SpeedRPM(60))
-                isright = True
+            if cs.reflected_light_intensity < 25:
+                super().on(SpeedRPM(80), SpeedRPM(60))
+            elif cs.reflected_light_intensity > 25:
+                super().on(SpeedRPM(60), SpeedRPM(80))
         super().stop()
-        if isright:
-            super().turn_left(SpeedRPM(40), 12)
-        else:
-            super().turn_right(SpeedRPM(40), 12)
 
-    def driveTillLineBack(self, cs):
+    def driveTillLine(self, cs):
         while cs.reflected_light_intensity > 25:
-            super().on(SpeedRPM(-60), SpeedRPM(-60))
+            super().on(self.speed, self.speed)
         super().stop()
 
-    def driveTillFloorBack(self, cs):
+    def driveTillFloor(self, cs):
         while cs.reflected_light_intensity < 25:
-            super().on(SpeedRPM(-60), SpeedRPM(-60))
+            super().on(self.speed, self.speed)
         super().stop()
 
 #------------------
 # our functions:
 #------------------
-def followLineBackForms(driveAdapter, cs, ms, startsright=True):
-    starttime = time.time()
-    isright = startsright
-    while time.time() < starttime + ms/1000:
-        if isright:
-            while cs.reflected_light_intensity > 25:
-                driveAdapter.on(SpeedRPM(-60), SpeedRPM(-60))
-            while cs.reflected_light_intensity < 25:
-                driveAdapter.on(SpeedRPM(-60), SpeedRPM(-30))
-            isright = False
-        else:
-            while cs.reflected_light_intensity > 25:
-                driveAdapter.on(SpeedRPM(-60), SpeedRPM(-60))
-            while cs.reflected_light_intensity < 25:
-                driveAdapter.on(SpeedRPM(-30), SpeedRPM(-60))
-            isright = True
-    driveAdapter.stop()
-    if isright:
-        driveAdapter.turn_left(SpeedRPM(40), 12)
-    else:
-        driveAdapter.turn_right(SpeedRPM(40), 12)
-
-def driveTillLineBack(driveAdapter, cs):
-    while cs.reflected_light_intensity > 25:
-        driveAdapter.on(SpeedRPM(-60), SpeedRPM(-60))
-    driveAdapter.stop()
-
-def driveTillFloorBack(driveAdapter, cs):
-    while cs.reflected_light_intensity < 25:
-        driveAdapter.on(SpeedRPM(-60), SpeedRPM(-60))
-    driveAdapter.stop()
 
 def waitTillLights(state, cs):
     cs.mode = cs.MODE_COL_AMBIENT
@@ -181,17 +138,42 @@ class Bumper:
 class Gripper(MediumMotor):
     def __init__(self, Port) -> None:
         super().__init__(Port)
-        super().stop_action = super().STOP_ACTION_HOLD
-        self.degrees = 0 # 0 = closed, 360 = open
+        self.deg = 0 # 0 = closed, 360 = open
 
-    def open(self):
-        super().on_for_degrees(SpeedRPM(40), 360-self.degrees)
-        self.degrees = 360
+    def set_degrees(self, deg):
+        self.deg = deg
 
     def close(self):
-        super().on_for_degrees(SpeedRPM(-40), self.degrees)
-        self.degrees = 0
+        super().on_for_degrees(SpeedRPM(-70), 360-self.deg)
+        self.deg = 360
 
+    def open(self):
+        super().on_for_degrees(SpeedRPM(70), self.deg)
+        self.deg = 0
+
+    # 0% - open     100% - closed
     def position(self, percent):
-        super().on_for_degrees(SpeedRPM(40), (percent * 3.6)-self.degrees)
-        self.degrees = percent*3.6
+        super().on_for_degrees(SpeedRPM(70), self.deg-(percent * 3.6))
+        self.deg = percent*3.6
+
+#------------------
+# Lift Class
+#------------------
+class Lifter(MediumMotor):
+    def __init__(self, Port) -> None:
+        super().__init__(Port)
+        self.rot = self.hight_to_rotations(3.6)
+
+    def move_relativ(self,cm):
+        super().on_for_rotations(100,self.hight_to_rotations(cm))
+        self.rot += self.hight_to_rotations(cm)
+
+    def hight_to_rotations(self, cm):
+        return cm/3
+
+    def get_current_hight(self):
+        return self.rot*3
+
+    def move_absolut(self,cm):
+        dif = cm - self.get_current_hight()
+        super().on_for_rotations(100,self.hight_to_rotations(dif))
