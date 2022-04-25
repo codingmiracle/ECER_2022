@@ -37,15 +37,18 @@ def stop():
 timer = th.Timer(118, stop)
 
 def main():
-    ''' --- Programm for BigBot --- '''
+    ''' --- Programm for BigBot ---
+        bot is placed 45deg bith bumper in the corner
+    '''
 
     # set the console just how we want it
     set_cursor(OFF)
 
-    #waitTillLights(ON, ls)
+    waitTillLights(ON, ls)
     timer.start()
 
     driveAdapter.odometry_start(theta_degrees_start=45)
+
     # align back -> bad for odometry
     # while True:
     #     driveAdapter.on(SpeedRPM(-50), SpeedRPM(-50))
@@ -82,7 +85,60 @@ def main():
     driveAdapter.odometry_stop()
 
 
+# get botguy
+def main2():
+    ''' --- Programm for BigBot ---
+        bot is placed 45deg bith bumper in the corner
+    '''
 
+    # set the console just how we want it
+    set_cursor(OFF)
+
+    waitTillLights(ON, ls)
+    timer.start()
+
+    driveAdapter.odometry_start(theta_degrees_start=45)
+
+    # align back -> bad for odometry
+    # while True:
+    #     driveAdapter.on(SpeedRPM(-50), SpeedRPM(-50))
+    #     if bumper.pressed_front():
+    #         driveAdapter.stop()
+    #         break
+
+    # init
+    lifter.move_absolut(0)
+
+    driveAdapter.on_for_distance(spdfast, 500)
+    driveAdapter.turn_right(spdstd, 135)
+
+    driveAdapter.driveTillBump(bumper)
+
+    driveAdapter.on_for_distance(spdstd*-1, 100)
+    driveAdapter.turn_right(spdstd, 90)
+
+    driveAdapter.driveTillLine(ls)
+
+    driveAdapter.on_for_distance(spdstd, 160)
+    driveAdapter.turn_right(spdstd, 90)
+
+    gripper.open()
+    lifter.move_absolut(45)
+    driveAdapter.on_for_distance(spdstd*-1, 100)
+    gripper.close()
+
+    driveAdapter.driveTillBump(bumper)
+    driveAdapter.on_for_distance(spdstd*-1, 5)
+    driveAdapter.turn_left(spdstd, 90)
+
+    driveAdapter.driveTillBump(bumper)
+    driveAdapter.on_for_distance(spdstd*-1, 5)
+    driveAdapter.turn_left(spdstd, 135)
+
+    lifter.move_absolut(25)
+
+    driveAdapter.stop()
+    driveAdapter.odometry_stop()
 
 if __name__ == '__main__':
     main()

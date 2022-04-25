@@ -57,9 +57,9 @@ class DriveAdapter(MoveDifferential):
     def setSpeed(self, spd=spdstd):
         self.speed = spd
 
-    def followLineForMs(self, cs, ms):
+    def followLineForSecs(self, cs, s):
         starttime = time.time()
-        while time.time() < starttime + ms/1000:
+        while time.time() < starttime + s:
             if cs.reflected_light_intensity < 25:
                 super().on(SpeedRPM(80), SpeedRPM(60))
             elif cs.reflected_light_intensity > 25:
@@ -76,6 +76,14 @@ class DriveAdapter(MoveDifferential):
             super().on(self.speed, self.speed)
         super().stop()
 
+    def driveTillBump(self, bumper):
+        while True:
+            super().on(self.speed, self.speed)
+            if bumper.pressed_front():
+                super().stop()
+                sleep(0.1)
+                break
+
 #------------------
 # our functions:
 #------------------
@@ -83,12 +91,18 @@ class DriveAdapter(MoveDifferential):
 def waitTillLights(state, cs):
     cs.mode = cs.MODE_COL_AMBIENT
     if state:
-        while cs.ambient_light_intensity < 40:
-            time.sleep(0.1)
+        while cs.ambient_light_intensity < 6:
+            time.sleep(0.01)
+            debug_print(cs.ambient_light_intensity)
     else:
-        while cs.ambient_light_intensity > 60:
-            time.sleep(0.1)
+        while cs.ambient_light_intensity >= 6:
+            time.sleep(0.01)
+            debug_print(cs.ambient_light_intensity)
 
+    cs.mode = cs.MODE_COL_REFLECT
+
+def back(speed):
+    return speed * -1
 
 #------------------
 # Bumper class
@@ -144,16 +158,16 @@ class Gripper(MediumMotor):
         self.deg = deg
 
     def close(self):
-        super().on_for_degrees(SpeedRPM(-70), 360-self.deg)
+        super().on_for_degrees(SpeedRPM(-90), 360-self.deg)
         self.deg = 360
 
     def open(self):
-        super().on_for_degrees(SpeedRPM(70), self.deg)
+        super().on_for_degrees(SpeedRPM(90), self.deg)
         self.deg = 0
 
     # 0% - open     100% - closed
     def position(self, percent):
-        super().on_for_degrees(SpeedRPM(70), self.deg-(percent * 3.6))
+        super().on_for_degrees(SpeedRPM(90), self.deg-(percent * 3.6))
         self.deg = percent*3.6
 
 #------------------
