@@ -176,13 +176,16 @@ class Gripper(MediumMotor):
 class Lifter(MediumMotor):
     def __init__(self, Port) -> None:
         super().__init__(Port)
-        self.rot = self.hight_to_rotations(3.6)
+        self.rot = self.height_to_rotations(3.6)
 
     def move_relativ(self,cm):
-        super().on_for_rotations(100,self.hight_to_rotations(cm))
-        self.rot += self.hight_to_rotations(cm)
+        super().on_for_rotations(100,self.height_to_rotations(cm))
+        self.rot += self.height_to_rotations(cm)
 
-    def hight_to_rotations(self, cm):
+    def set_height(self, cm):
+        self.rot = self.height_to_rotations(cm)
+
+    def height_to_rotations(self, cm):
         return cm/3
 
     def get_current_hight(self):
@@ -190,4 +193,4 @@ class Lifter(MediumMotor):
 
     def move_absolut(self,cm):
         dif = cm - self.get_current_hight()
-        super().on_for_rotations(100,self.hight_to_rotations(dif))
+        super().on_for_rotations(100,self.height_to_rotations(dif))

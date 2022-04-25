@@ -57,8 +57,9 @@ def main():
     #         break
 
     # init
-    # driveAdapter.turn_right(spdstd, 135)
-    # lifter.move_absolut(0)
+    lifter.move_absolut(20)
+    driveAdapter.turn_right(spdstd, 135)
+    lifter.move_absolut(0)
 
     driveAdapter.driveTillLine(ls)
     driveAdapter.on_for_distance(spdstd, 170)
@@ -71,7 +72,7 @@ def main():
             sleep(0.2)
             driveAdapter.stop()
             break
-
+    lifter.move_absolut(0)
     gripper.position(20)
     driveAdapter.setSpeed(-1*spdfast)
     driveAdapter.driveTillLine(ls)
@@ -80,65 +81,26 @@ def main():
     driveAdapter.on_for_distance(-1*spdfast, 700)
     gripper.close()
 
+    for i in range(2):
+        lifter.move_relativ(20)
+        driveAdapter.on_for_distance(back(spdstd), 100+i*30)
+        gripper.open()
+        driveAdapter.on_for_distance(spdstd, 100+i*30)
+        lifter.move_absolut(0)
+        if not i:
+            gripper.close()
+
+    driveAdapter.on_for_distance(spdstd, 50)
+    driveAdapter.turn_right(spdstd, 90)
+
+
+    #lift up, 5 cm vor fahren, dann droppen, 5 cm oder mehr zurück, lift runter, 2.mal prüfen
+
 
     driveAdapter.stop()
     driveAdapter.odometry_stop()
 
 
-# get botguy
-def main2():
-    ''' --- Programm for BigBot ---
-        bot is placed 45deg bith bumper in the corner
-    '''
-
-    # set the console just how we want it
-    set_cursor(OFF)
-
-    waitTillLights(ON, ls)
-    timer.start()
-
-    driveAdapter.odometry_start(theta_degrees_start=45)
-
-    # align back -> bad for odometry
-    # while True:
-    #     driveAdapter.on(SpeedRPM(-50), SpeedRPM(-50))
-    #     if bumper.pressed_front():
-    #         driveAdapter.stop()
-    #         break
-
-    # init
-    lifter.move_absolut(0)
-
-    driveAdapter.on_for_distance(spdfast, 500)
-    driveAdapter.turn_right(spdstd, 135)
-
-    driveAdapter.driveTillBump(bumper)
-
-    driveAdapter.on_for_distance(spdstd*-1, 100)
-    driveAdapter.turn_right(spdstd, 90)
-
-    driveAdapter.driveTillLine(ls)
-
-    driveAdapter.on_for_distance(spdstd, 160)
-    driveAdapter.turn_right(spdstd, 90)
-
-    gripper.open()
-    lifter.move_absolut(45)
-    driveAdapter.on_for_distance(spdstd*-1, 100)
-    gripper.close()
-
-    driveAdapter.driveTillBump(bumper)
-    driveAdapter.on_for_distance(spdstd*-1, 5)
-    driveAdapter.turn_left(spdstd, 90)
-
-    driveAdapter.driveTillBump(bumper)
-    driveAdapter.on_for_distance(spdstd*-1, 5)
-    driveAdapter.turn_left(spdstd, 135)
-
-    lifter.move_absolut(25)
-
-    driveAdapter.stop()
-    driveAdapter.odometry_stop()
 
 if __name__ == '__main__':
     main()
