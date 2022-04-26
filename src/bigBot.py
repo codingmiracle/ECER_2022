@@ -45,20 +45,18 @@ def main():
 
     # init
     waitTillLights(ON, ls)
-    lifter.move_to(0)
-    driveAdapter.on_for_distance(back(spdstd), 400)
-    driveAdapter.on_for_distance(spdstd, 400)
-    driveAdapter.turn_right(spdslow, 135)
+    driveAdapter.setSpeed(spdstd)
+    driveAdapter.on_for_distance(back(spdstd), 500)
 
     #drive to line
     driveAdapter.driveTillLine(ls)
-    driveAdapter.on_for_distance(spdstd, 160)
+    lifter.move_to(0)
+    sleep(0.4)
+    driveAdapter.turn_right(spdslow, 45)
 
-    driveAdapter.turn_left(spdslow, 90)
 
-    driveAdapter.setSpeed(70)
+
     driveAdapter.driveTillBump(bumper)
-
 
     # collect poms
     gripper.position(40)
@@ -74,20 +72,24 @@ def main():
         if not i:
             gripper.close()
 
-    driveAdapter.on_for_distance(spdstd, 100)
-
     # get botgui
     # drive s shape back and drive till Line
-    driveAdapter.on(spdfast, spdstd)
-    sleep(1.5)
+    driveAdapter.on(spdfast, spdslow)
+    sleep(0.5)
     driveAdapter.on(spdstd, spdfast)
-    sleep(1.5)
+    sleep(0.5)
     driveAdapter.stop()
     driveAdapter.driveTillLine(ls)
+    driveAdapter.on_for_distance(spdstd, 150)
+    driveAdapter.turn_left(spdslow, 90)
 
-    # or drive back and align aon wall
-    # driveAdapter.turn_right(spdstd, 90)
-    # driveAdapter.driveTillBump(bumper)
+    lifter.move(49)
+    driveAdapter.on_for_distance(back(spdstd), 150)
+    gripper.position(80)
+    driveAdapter.on_for_distance(spdstd, 150)
+    lifter.move_to(20)
+
+    driveAdapter.on_for_distance(spdstd, 500)
 
     lifter.move_to(3.6)
     gripper.open()
