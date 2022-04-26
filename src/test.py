@@ -10,19 +10,6 @@ import ev3dev2.wheel
 
 from lib import *
 
-# --- Functions ---
-
-def print_pass(test_name):
-    print(f"{test_name}:\t Pass ✅", file=sys.stderr)
-def print_fail(test_name):
-    print(f"{test_name}:\t Fail ❌", file=sys.stderr)
-
-def test(func):
-    try:
-        func()
-        print_pass(func.__name__)
-    except:
-        print_fail(func.__name__)
 
 class Test(unittest.TestProgram):
     def __init__(self) -> None:
@@ -35,24 +22,15 @@ class Test(unittest.TestProgram):
         self.ls = ev3sensors.ColorSensor(ev3inputs.INPUT_1)
 
     def run(self):
-        set_cursor(OFF)
-        # get botguy
-        # self.lifter.move_absolut(0)
-        # self.driveAdapter.on_for_distance(back(spdfast), 300)
-        # self.driveAdapter.turn_right(spdstd, 135)
-        # self.driveAdapter.setSpeed(spdfast)
-        # self.driveAdapter.driveTillBump(Bumper(ev3inputs.INPUT_2, ev3inputs.INPUT_3))
+        bb_main()
+
+
+        # self.lifter.height = 0
+        # self.lifter.move(49)
         # self.driveAdapter.on_for_distance(back(spdstd), 100)
-        # self.driveAdapter.turn_right(spdstd, 90)
-        # self.driveAdapter.driveTillLine(self.ls)
-        # self.driveAdapter.on_for_distance(spdstd, 150)
-        # self.driveAdapter.turn_right(spdstd, 90)
-        # self.lifter.move_absolut(50)
-        # self.driveAdapter.on_for_distance(back(spdstd), 100)
-        # self.gripper.close()
-        self.lifter.set_height(20)
-        self.lifter.move_absolut(0)
-        self.lifter.move_absolut(53)
+        # self.gripper.position(80)
+        # self.driveAdapter.on_for_distance(spdstd, 100)
+        # self.lifter.move_to(20)
 
 
 
@@ -85,59 +63,59 @@ def bb_main():
     # set the console just how we want it
     set_cursor(OFF)
 
-    # waitTillLights(ON, ls)
+    # start
     timer.start()
-
     driveAdapter.odometry_start(theta_degrees_start=45)
 
-    # align back -> bad for odometry
-    # while True:
-    #     driveAdapter.on(SpeedRPM(-50), SpeedRPM(-50))
-    #     if bumper.pressed_front():
-    #         driveAdapter.stop()
-    #         break
-
     # init
-    lifter.move_absolut(20)
-    driveAdapter.turn_right(spdstd, 135)
-    #lifter.move_absolut(0)
-    lifter.set_height(0)
+    lifter.move_to(0)
+    driveAdapter.on_for_distance(back(spdstd), 400)
+    driveAdapter.on_for_distance(spdstd, 400)
+    driveAdapter.turn_right(spdslow, 135)
 
+    #drive to line
     driveAdapter.driveTillLine(ls)
-    driveAdapter.on_for_distance(spdstd, 170)
+    driveAdapter.on_for_distance(spdstd, 160)
 
     driveAdapter.turn_left(spdslow, 90)
-    #align back
-    while True:
-        driveAdapter.on(spdstd, spdstd)
-        if bumper.pressed_front():
-            sleep(0.2)
-            driveAdapter.stop()
-            break
-    lifter.move_absolut(0)
-    gripper.position(20)
-    driveAdapter.setSpeed(-1*spdfast)
-    driveAdapter.driveTillLine(ls)
 
-    driveAdapter.on_for_seconds(SpeedRPM(-60), SpeedRPM(-40), 0.5)
-    driveAdapter.on_for_distance(-1*spdfast, 700)
+    driveAdapter.driveTillBump(bumper)
+
+    # collect poms
+    gripper.position(40)
+    driveAdapter.on_for_distance(-1*spdfast, 1350)
     gripper.close()
 
     for i in range(2):
-        lifter.move_relativ(20)
-        driveAdapter.on_for_distance(back(spdstd), 100+i*30)
+        lifter.move(8)
+        driveAdapter.on_for_distance(back(spdstd), 150-i*30)
         gripper.open()
         driveAdapter.on_for_distance(spdstd, 100+i*30)
-        lifter.move_absolut(0)
+        lifter.move_to(0)
         if not i:
             gripper.close()
 
-    driveAdapter.on_for_distance(spdstd, 50)
-    driveAdapter.turn_right(spdstd, 90)
+    driveAdapter.on_for_distance(spdstd, 100)
 
+    # get botgui
+    # drive s shape back and drive till Line
+    driveAdapter.on(spdfast, spdslow)
+    sleep(1)
+    driveAdapter.on(spdstd, spdslow)
+    sleep(1)
+    driveAdapter.stop()
+    driveAdapter.driveTillLine(ls)
+    driveAdapter.on_for_distance(spdstd, 150)
+    driveAdapter.turn_right(90)
 
+    lifter.move(49)
+    driveAdapter.on_for_distance(back(spdstd), 150)
+    gripper.position(80)
+    driveAdapter.on_for_distance(spdstd, 150)
+    lifter.move_to(20)
 
-
+    lifter.move_to(3.6)
+    gripper.open()
     driveAdapter.stop()
     driveAdapter.odometry_stop()
 
@@ -146,5 +124,23 @@ def bb_main():
 
 if __name__ == '__main__':
     t = Test()
-    # t.run()
-    # test(bb_main)
+    t.run()
+
+
+
+
+
+# get botguy code von test.run()
+        # self.lifter.move_to(0)
+        # self.driveAdapter.on_for_distance(back(spdfast), 300)
+        # self.driveAdapter.turn_right(spdstd, 135)
+        # self.driveAdapter.setSpeed(spdfast)
+        # self.driveAdapter.driveTillBump(Bumper(ev3inputs.INPUT_2, ev3inputs.INPUT_3))
+        # self.driveAdapter.on_for_distance(back(spdstd), 100)
+        # self.driveAdapter.turn_right(spdstd, 90)
+        # self.driveAdapter.driveTillLine(self.ls)
+        # self.driveAdapter.on_for_distance(spdstd, 150)
+        # self.driveAdapter.turn_right(spdstd, 90)
+        # self.lifter.move_to(50)
+        # self.driveAdapter.on_for_distance(back(spdstd), 100)
+        # self.gripper.close()

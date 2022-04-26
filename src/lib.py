@@ -81,7 +81,7 @@ class DriveAdapter(MoveDifferential):
             super().on(self.speed, self.speed)
             if bumper.pressed_front():
                 super().stop()
-                sleep(0.1)
+                sleep(0.2)
                 break
 
 #------------------
@@ -152,23 +152,23 @@ class Bumper:
 class Gripper(MediumMotor):
     def __init__(self, Port) -> None:
         super().__init__(Port)
-        self.deg = 0 # 0 = closed, 360 = open
+        self.deg = 0 # 0 = open, 520 = closed
 
     def set_degrees(self, deg):
         self.deg = deg
 
     def close(self):
-        super().on_for_degrees(SpeedRPM(-90), 360-self.deg)
-        self.deg = 360
+        super().on_for_degrees(SpeedRPM(-90), 520-self.deg)
+        self.deg = 520
 
     def open(self):
         super().on_for_degrees(SpeedRPM(90), self.deg)
         self.deg = 0
 
-    # 0% - open     100% - closed
+    # 0% - open     100% - closed5
     def position(self, percent):
-        super().on_for_degrees(SpeedRPM(90), self.deg-(percent * 3.6))
-        self.deg = percent*3.6
+        super().on_for_degrees(SpeedRPM(90), self.deg-(percent * 5.2))
+        self.deg = percent*5.2
 
 #------------------
 # Lift Class
@@ -176,21 +176,19 @@ class Gripper(MediumMotor):
 class Lifter(MediumMotor):
     def __init__(self, Port) -> None:
         super().__init__(Port)
-        self.rot = self.height_to_rotations(3.6)
+        self.height = 3.6
 
-    def move_relativ(self,cm):
+    def move(self,cm):
         super().on_for_rotations(100,self.height_to_rotations(cm))
-        self.rot += self.height_to_rotations(cm)
-
-    def set_height(self, cm):
-        self.rot = self.height_to_rotations(cm)
+        self.height += cm
 
     def height_to_rotations(self, cm):
         return cm/3
 
-    def get_current_hight(self):
-        return self.rot*3
-
-    def move_absolut(self,cm):
-        dif = cm - self.get_current_hight()
+    def move_to(self,cm):
+        dif = cm - self.height
         super().on_for_rotations(100,self.height_to_rotations(dif))
+        self.height = cm
+
+    def init(self):
+        self.move_to(3.6)

@@ -10,11 +10,6 @@ import signal
 
 from lib import *
 
-# --- Functions ---
-
-def timeout_handler(signal, frame):
-    raise Exception('Time is up!')
-signal.signal(signal.SIGALRM, timeout_handler)
 
 # --- Motors and Sensors here ---
 leds = ev3leds.Leds()
@@ -44,62 +39,60 @@ def main():
     # set the console just how we want it
     set_cursor(OFF)
 
-    waitTillLights(ON, ls)
+    # start
     timer.start()
-
     driveAdapter.odometry_start(theta_degrees_start=45)
 
-    # align back -> bad for odometry
-    # while True:
-    #     driveAdapter.on(SpeedRPM(-50), SpeedRPM(-50))
-    #     if bumper.pressed_front():
-    #         driveAdapter.stop()
-    #         break
-
     # init
-    lifter.move_absolut(20)
-    driveAdapter.turn_right(spdstd, 135)
-    lifter.move_absolut(0)
+    waitTillLights(ON, ls)
+    lifter.move_to(0)
+    driveAdapter.on_for_distance(back(spdstd), 400)
+    driveAdapter.on_for_distance(spdstd, 400)
+    driveAdapter.turn_right(spdslow, 135)
 
+    #drive to line
     driveAdapter.driveTillLine(ls)
-    driveAdapter.on_for_distance(spdstd, 170)
+    driveAdapter.on_for_distance(spdstd, 160)
 
     driveAdapter.turn_left(spdslow, 90)
-    #align back
-    while True:
-        driveAdapter.on(spdstd, spdstd)
-        if bumper.pressed_front():
-            sleep(0.2)
-            driveAdapter.stop()
-            break
-    lifter.move_absolut(0)
-    gripper.position(20)
-    driveAdapter.setSpeed(-1*spdfast)
-    driveAdapter.driveTillLine(ls)
 
-    driveAdapter.on_for_seconds(SpeedRPM(-60), SpeedRPM(-40), 0.5)
-    driveAdapter.on_for_distance(-1*spdfast, 700)
+    driveAdapter.setSpeed(70)
+    driveAdapter.driveTillBump(bumper)
+
+
+    # collect poms
+    gripper.position(40)
+    driveAdapter.on_for_distance(-1*spdfast, 1300)
     gripper.close()
 
     for i in range(2):
-        lifter.move_relativ(20)
-        driveAdapter.on_for_distance(back(spdstd), 100+i*30)
+        lifter.move(8)
+        driveAdapter.on_for_distance(back(spdstd), 150-i*30)
         gripper.open()
         driveAdapter.on_for_distance(spdstd, 100+i*30)
-        lifter.move_absolut(0)
+        lifter.move_to(0)
         if not i:
             gripper.close()
 
-    driveAdapter.on_for_distance(spdstd, 50)
-    driveAdapter.turn_right(spdstd, 90)
+    driveAdapter.on_for_distance(spdstd, 100)
 
+    # get botgui
+    # drive s shape back and drive till Line
+    driveAdapter.on(spdfast, spdstd)
+    sleep(1.5)
+    driveAdapter.on(spdstd, spdfast)
+    sleep(1.5)
+    driveAdapter.stop()
+    driveAdapter.driveTillLine(ls)
 
-    #lift up, 5 cm vor fahren, dann droppen, 5 cm oder mehr zurück, lift runter, 2.mal prüfen
+    # or drive back and align aon wall
+    # driveAdapter.turn_right(spdstd, 90)
+    # driveAdapter.driveTillBump(bumper)
 
-
+    lifter.move_to(3.6)
+    gripper.open()
     driveAdapter.stop()
     driveAdapter.odometry_stop()
-
 
 
 if __name__ == '__main__':
