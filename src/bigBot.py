@@ -51,8 +51,10 @@ def main():
     #drive to line
     driveAdapter.driveTillLine(ls)
     lifter.move_to(0)
+    driveAdapter.on_for_distance(spdstd, 20)
     sleep(0.4)
     driveAdapter.turn_right(spdslow, 45)
+
 
 
 
@@ -84,12 +86,14 @@ def main():
     driveAdapter.turn_left(spdslow, 90)
 
     lifter.move(49)
-    driveAdapter.on_for_distance(back(spdstd), 150)
+    driveAdapter.on_for_distance(back(spdstd), 200)
     gripper.position(80)
-    driveAdapter.on_for_distance(spdstd, 150)
+    driveAdapter.on_for_distance(spdstd, 200)
     lifter.move_to(20)
 
-    driveAdapter.on_for_distance(spdstd, 500)
+    driveAdapter.driveTillBump(
+        bumper
+    )
 
     lifter.move_to(3.6)
     gripper.open()
