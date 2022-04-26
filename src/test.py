@@ -24,13 +24,13 @@ class Test(unittest.TestProgram):
     def run(self):
         bb_main()
 
-
         # self.lifter.height = 0
-        # self.lifter.move(49)
+        # self.lifter.move(50)
         # self.driveAdapter.on_for_distance(back(spdstd), 100)
         # self.gripper.position(80)
-        # self.driveAdapter.on_for_distance(spdstd, 100)
-        # self.lifter.move_to(20)
+        # self.driveAdapter.on_for_distance(spdstd, 200)
+        # self.lifter.move_to(0)
+        # self.driveAdapter.turn_left(spdslow, 180)
 
 
 
@@ -101,19 +101,18 @@ def bb_main():
     driveAdapter.on(spdfast, spdslow)
     sleep(0.5)
     driveAdapter.on(spdstd, spdfast)
-    sleep(0.5)
+    sleep(1)
     driveAdapter.stop()
     driveAdapter.driveTillLine(ls)
     driveAdapter.on_for_distance(spdstd, 150)
     driveAdapter.turn_left(spdslow, 90)
 
-    lifter.move(49)
-    driveAdapter.on_for_distance(back(spdstd), 200)
+    lifter.move(52)
+    driveAdapter.on_for_distance(back(spdstd), 150)
     gripper.position(80)
     driveAdapter.on_for_distance(spdstd, 200)
-    lifter.move_to(20)
-
-    driveAdapter.driveTillBump(bumper)
+    lifter.move_to(10)
+    driveAdapter.on_for_distance(spdstd, 600)
 
     lifter.move_to(3.6)
     gripper.open()
