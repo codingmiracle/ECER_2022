@@ -26,8 +26,8 @@ def stop():
     driveAdapter.stop()
     gripper.stop()
     lifter.stop()
-    while True:
-        leds.animate_stop()
+    leds.animate_rainbow()
+    sleep(10)
 
 timer = th.Timer(118, stop)
 
@@ -44,17 +44,15 @@ def main():
     driveAdapter.odometry_start(theta_degrees_start=45)
 
     # init
-    waitTillLights(ON, ls)
     driveAdapter.setSpeed(spdstd)
     driveAdapter.on_for_distance(back(spdstd), 500)
 
     #drive to line
     driveAdapter.driveTillLine(ls)
+    driveAdapter.on_for_distance(spdstd, 50)
     lifter.move_to(0)
-    driveAdapter.on_for_distance(spdstd, 20)
-    sleep(0.4)
+    sleep(2)
     driveAdapter.turn_right(spdslow, 45)
-
 
 
 
@@ -75,25 +73,33 @@ def main():
             gripper.close()
 
     # get botgui
-    # drive s shape back and drive till Line
-    driveAdapter.on(spdfast, spdslow)
-    sleep(0.5)
-    driveAdapter.on(spdstd, spdfast)
-    sleep(1)
-    driveAdapter.stop()
+    driveAdapter.setSpeed(spdstd)
+    driveAdapter.turn_right(spdstd, 90)
+
+    driveAdapter.driveTillBump(bumper)
+    driveAdapter.on_for_distance(back(spdstd), 150)
+    driveAdapter.turn_right(spdstd, 90)
+    driveAdapter.setSpeed(back(spdstd))
+
     driveAdapter.driveTillLine(ls)
     driveAdapter.on_for_distance(spdstd, 150)
-    driveAdapter.turn_left(spdslow, 90)
+    driveAdapter.turn_right(spdslow, 90)
 
-    lifter.move(52)
-    driveAdapter.on_for_distance(back(spdstd), 150)
+    lifter.move(48)
+    driveAdapter.on_for_distance(back(spdstd), 120)
     gripper.position(80)
-    driveAdapter.on_for_distance(spdstd, 200)
+    driveAdapter.on_for_distance(spdstd, 100)
+
+    driveAdapter.turn_right(spdslow,90)
+    driveAdapter.on_for_distance(back(spdstd), 200)
     lifter.move_to(10)
-    driveAdapter.on_for_distance(spdstd, 600)
+    driveAdapter.turn_right(spdstd, 25)
+    driveAdapter.on_for_distance(back(spdstd), 450)
 
     lifter.move_to(3.6)
     gripper.open()
+    driveAdapter.turn_right()
+    driveAdapter.on_for_distance(spdstd, 300)
     driveAdapter.stop()
     driveAdapter.odometry_stop()
 
