@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import threading as th
+import _thread
 import ev3dev2.led as ev3leds
 import ev3dev2.sensor.lego as ev3sensors
 import ev3dev2.sensor as ev3inputs
@@ -23,13 +24,11 @@ driveAdapter.cs = ls
 
 def stop():
     debug_print("Time is up!")
-    driveAdapter.stop()
-    gripper.stop()
-    lifter.stop()
-    leds.animate_rainbow()
-    sleep(10)
+    driveAdapter.stop = True
+    _thread.interrupt_main()
+    sys.exit()
 
-timer = th.Timer(118, stop)
+timer = th.Timer(110, stop)
 
 def main():
     ''' --- Programm for BigBot ---
@@ -44,6 +43,7 @@ def main():
     driveAdapter.odometry_start(theta_degrees_start=45)
 
     # init
+    waitTillLights(ON, ls)
     driveAdapter.setSpeed(spdstd)
     driveAdapter.on_for_distance(back(spdstd), 500)
 
@@ -86,20 +86,27 @@ def main():
     driveAdapter.turn_right(spdslow, 90)
 
     lifter.move(48)
-    driveAdapter.on_for_distance(back(spdstd), 120)
+    driveAdapter.on_for_distance(back(spdstd), 110)
     gripper.position(80)
     driveAdapter.on_for_distance(spdstd, 100)
 
     driveAdapter.turn_right(spdslow,90)
+    gripper.open()
+    lifter.move_to(0)
     driveAdapter.on_for_distance(back(spdstd), 200)
-    lifter.move_to(10)
+    gripper.position(80)
+
     driveAdapter.turn_right(spdstd, 25)
     driveAdapter.on_for_distance(back(spdstd), 450)
 
+    lifter.move_to(10)
+    gripper.open()
+
+    driveAdapter.turn_left(spdstd, 90)
+    driveAdapter.on_for_distance(spdstd, 400)
+
     lifter.move_to(3.6)
     gripper.open()
-    driveAdapter.turn_right()
-    driveAdapter.on_for_distance(spdstd, 300)
     driveAdapter.stop()
     driveAdapter.odometry_stop()
 

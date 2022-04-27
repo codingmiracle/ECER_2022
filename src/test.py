@@ -3,6 +3,7 @@
 from curses import COLOR_CYAN
 import unittest
 import threading as th
+import _thread
 import ev3dev2.led as ev3leds
 import ev3dev2.sensor.lego as ev3sensors
 import ev3dev2.sensor as ev3inputs
@@ -24,15 +25,6 @@ class Test(unittest.TestProgram):
 
     def run(self):
         bb_main()
-
-        # self.lifter.move_to(0)
-        # sleep(1)
-        # self.lifter.move_to(49)
-        # self.driveAdapter.on_for_distance(back(spdstd), 150)
-        # self.gripper.position(80)
-        # self.driveAdapter.on_for_distance(spdstd, 200)
-        # self.lifter.init()
-        # self.gripper.open()
         return
 
 
@@ -50,13 +42,11 @@ driveAdapter.cs = ls
 
 def stop():
     debug_print("Time is up!")
-    driveAdapter.stop()
-    gripper.stop()
-    lifter.stop()
-    leds.animate_rainbow()
-    sleep(10)
+    driveAdapter.stop = True
+    _thread.interrupt_main()
+    sys.exit()
 
-timer = th.Timer(118, stop)
+timer = th.Timer(110, stop)
 
 def bb_main():
     ''' --- Programm for BigBot ---
@@ -113,7 +103,7 @@ def bb_main():
     driveAdapter.turn_right(spdslow, 90)
 
     lifter.move(48)
-    driveAdapter.on_for_distance(back(spdstd), 120)
+    driveAdapter.on_for_distance(back(spdstd), 110)
     gripper.position(80)
     driveAdapter.on_for_distance(spdstd, 100)
 
@@ -125,8 +115,8 @@ def bb_main():
 
     lifter.move_to(3.6)
     gripper.open()
-    driveAdapter.turn_right()
-    driveAdapter.on_for_distance(spdstd, 300)
+    driveAdapter.turn_right(spdstd, 90)
+    driveAdapter.on_for_distance(spdstd, 400)
     driveAdapter.stop()
     driveAdapter.odometry_stop()
 

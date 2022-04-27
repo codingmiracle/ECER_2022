@@ -51,15 +51,24 @@ class DriveAdapter(MoveDifferential):
         super().odometry_start()
         super().odometry_coordinates_log()
         self.speed = spdstd
+        self.stop = 0
         if inversed:
             super().set_polarity('inversed')
 
     def setSpeed(self, spd=spdstd):
         self.speed = spd
 
+    def stop(self, motors=None, brake=True):
+        return super().stop(motors, brake)
+
     def followLineForSecs(self, cs, s):
         starttime = time.time()
         while time.time() < starttime + s:
+            if self.stop:
+                super().stop()
+                sys.exit()
+                break
+
             if cs.reflected_light_intensity < 25:
                 super().on(SpeedRPM(80), SpeedRPM(60))
             elif cs.reflected_light_intensity > 25:
@@ -68,16 +77,28 @@ class DriveAdapter(MoveDifferential):
 
     def driveTillLine(self, cs):
         while cs.reflected_light_intensity > 25:
+            if self.stop:
+                super().stop()
+                sys.exit()
+                break
             super().on(self.speed, self.speed)
         super().stop()
 
     def driveTillFloor(self, cs):
         while cs.reflected_light_intensity < 25:
+            if self.stop:
+                super().stop()
+                sys.exit()
+                break
             super().on(self.speed, self.speed)
         super().stop()
 
     def driveTillBump(self, bumper):
         while True:
+            if self.stop:
+                super().stop()
+                sys.exit()
+                break
             super().on(self.speed, self.speed)
             if bumper.pressed_front():
                 super().stop()
