@@ -5,4 +5,4 @@
 * always pull/push after commit!!!
 
 # 3rd place, judges choice
-deprecated
+code is deprecated!
